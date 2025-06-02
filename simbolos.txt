@@ -1,0 +1,4 @@
+_start: 0000
+hanoi: 0000
+recursivo: 0000
+fin_hanoi: 0000
