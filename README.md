@@ -34,7 +34,7 @@ ensamblador/
 
 - Python 3.6 o superior
 
-### ▶️ Instrucciones
+### Instrucciones
 
 1. Escribe tu código ensamblador en `programa.asm` utilizando instrucciones compatibles.
 2. Ejecuta el ensamblador desde la terminal:
