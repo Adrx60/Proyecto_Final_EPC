@@ -7,14 +7,14 @@
 ╚════════════════════════════════════════════════════════╝
 ```
 
-# 🛠️ Ensamblador IA-32 (x86 de 32 bits) en Python
+# Ensamblador IA-32 (x86 de 32 bits) en Python
 
 Este proyecto es un ensamblador básico para la arquitectura IA-32 (x86 de 32 bits), desarrollado en Python.  
 Su objetivo es traducir instrucciones en lenguaje ensamblador (`programa.asm`) a código máquina en formato hexadecimal, y generar archivos auxiliares como la **tabla de símbolos** y la **tabla de referencias**.
 
 ---
 
-## 📁 Estructura del Proyecto
+## Estructura del Proyecto
 
 ```bash
 ensamblador/
@@ -28,9 +28,9 @@ ensamblador/
 
 ---
 
-## 🚀 Ejecución
+## Ejecución
 
-### 🔧 Requisitos
+### Requisitos
 
 - Python 3.6 o superior
 
@@ -50,9 +50,9 @@ python ensamblador.py
 
 ---
 
-## 🧠 Instrucciones Soportadas
+## Instrucciones Soportadas
 
-### 🔄 Transferencia y operaciones
+### Transferencia y operaciones
 
 | Instrucción | Descripción                                             |
 |------------|----------------------------------------------------------|
@@ -64,7 +64,7 @@ python ensamblador.py
 | `inc`      | Incrementa el valor de un registro                       |
 | `dec`      | Decrementa el valor de un registro                       |
 
-### 🔀 Saltos condicionales e incondicionales
+### Saltos condicionales e incondicionales
 
 | Instrucción | Descripción                                      |
 |------------|---------------------------------------------------|
@@ -74,7 +74,7 @@ python ensamblador.py
 | `jl`, `jle`| Salta si menor / menor o igual                    |
 | `loop`     | Disminuye `ecx` y salta si no es 0                |
 
-### 🧩 Subrutinas y pila
+### Subrutinas y pila
 
 | Instrucción | Descripción                                                  |
 |------------|---------------------------------------------------------------|
@@ -84,7 +84,7 @@ python ensamblador.py
 | `pop`      | Saca un valor de la pila                                      |
 | `leave`    | Limpia el stack frame (equivale a `mov esp, ebp` + `pop ebp`) |
 
-### ⚙️ Interrupciones
+### Interrupciones
 
 | Instrucción | Descripción                                     |
 |------------|--------------------------------------------------|
@@ -92,7 +92,7 @@ python ensamblador.py
 
 ---
 
-## 🧾 Registros Soportados
+## Registros Soportados
 
 | Registro | Función                         |
 |----------|----------------------------------|
@@ -107,7 +107,7 @@ python ensamblador.py
 
 ---
 
-## ⚙️ Funcionamiento Interno
+## Funcionamiento Interno
 
 El ensamblador procesa el archivo `.asm` en **dos fases** principales:
 
@@ -117,7 +117,7 @@ El ensamblador procesa el archivo `.asm` en **dos fases** principales:
 2. **Traducción a código máquina**:  
    Cada instrucción se convierte a su equivalente en hexadecimal, y se genera el archivo `programa.hex`.
 
-### 🔍 Componentes clave del código
+### Componentes clave del código
 
 - `procesar_linea(linea)` → Traduce una línea ensamblador a código máquina.
 - `resolver_referencias()` → Resuelve direcciones relativas/absolutas de etiquetas.
@@ -126,7 +126,7 @@ El ensamblador procesa el archivo `.asm` en **dos fases** principales:
 
 ---
 
-## ⚠️ Consideraciones
+## Consideraciones
 
 - No se soportan **macros**, directivas como `.data` o `.text`, ni estructuras avanzadas.
 - Las etiquetas deben ser **únicas** y estar correctamente posicionadas.
