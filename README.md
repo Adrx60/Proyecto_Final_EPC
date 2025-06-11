@@ -1,153 +1,135 @@
+# Ensamblador IA‑32 (x86 de 32 bits) en Python
 
-```
-╔════════════════════════════════════════════════════════╗
-║////////////////////////////////////////////////////////║
-║#######     ALUMNO: Ortiz García Pablo Adrián    #######║
-║////////////////////////////////////////////////////////║
-╚════════════════════════════════════════════════════════╝
-```
-
-# Ensamblador IA-32 (x86 de 32 bits) en Python
-
-Este proyecto es un ensamblador básico para la arquitectura IA-32 (x86 de 32 bits), desarrollado en Python.  
-Su objetivo es traducir instrucciones en lenguaje ensamblador (`programa.asm`) a código máquina en formato hexadecimal, y generar archivos auxiliares como la **tabla de símbolos** y la **tabla de referencias**.
+## 1. Introducción  
+**Descripción del problema**  
+El propósito de este proyecto es desarrollar un ensamblador para la arquitectura IA‑32 que traduzca código en lenguaje ensamblador a código máquina (hexadecimal). El desafío principal es implementar las fases de análisis léxico de instrucciones, resolución de etiquetas y generación del formato binario, soportando múltiples modos de direccionamiento y diferentes tipos de instrucciones (registros, memoria, saltos, pila, interrupciones, llamadas, unarias). La herramienta debe ser precisa, modular y escalable para agregar más funcionalidades en el futuro.
 
 ---
 
-## Estructura del Proyecto
+## 2. Desarrollo (Análisis y diseño de la solución)
 
-```bash
+### 2.1 Análisis  
+- **Entrada**: archivo `programa.asm` con instrucciones y etiquetas en sintaxis x86‑32.  
+- **Salida**:  
+  - `programa.hex` → código máquina en formato hexadecimal.  
+  - `simbolos.txt` → tabla de símbolos con direcciones.  
+  - `referencias.txt` → posiciones de referencias a etiquetas.  
+- **Requisitos**:  
+  - Dos fases:  
+    1. Procesamiento de cada línea (identificar secciones, etiquetas, instrucciones).  
+    2. Resolución de referencias (saltos, llamadas, memoria) con cálculos relativos o absolutos.  
+  - Soportar modos de direccionamiento: registro–registro, registro–memoria, inmediato a registro.  
+  - Soporte para varios tipos de instrucciones: aritméticas, de salto, llamadas, interrupciones, pila, unarias.
+
+### 2.2 Diseño  
+- Clase `EnsambladorIA32`: encapsula funcionalidad de ensamblado.  
+  - Atributos:  
+    - `codigo`: lista de bytes generados.  
+    - `pos_codigo`: posición actual en código.  
+    - `tabla_simbolos`, `tabla_referencias`: para etiquetas y referencias.  
+    - `datos`: diccionario para datos en `.data`.  
+    - `seccion`, `direccion_datos`: para control de secciones.  
+  - Métodos principales:  
+    - `procesar_linea()`: analiza y traduce cada instrucción.  
+    - `resolver_referencias()`: calcula offsets y rellena bytes pendientes.  
+    - `ensamblar(lineas)`: ejecuta procesamiento y resolución en orden.  
+    - `guardar_archivos()`: exporta salidas necesarias.  
+- Diccionarios de códigos de operación (`opcode`): definidos de forma estática para cada instrucción.
+
+---
+
+## 3. Implementación  
+El proyecto está estructurado de la siguiente forma:
+
+```
 ensamblador/
-├── ensamblador.py      # Código principal del ensamblador (clase EnsambladorIA32)
-├── programa.asm        # Archivo de entrada con el código ensamblador
-├── programa.hex        # Salida con el código máquina en hexadecimal
-├── simbolos.txt        # Tabla de símbolos con etiquetas y direcciones
-├── referencias.txt     # Tabla de referencias a etiquetas (saltos, llamadas)
-└── README.md           # Documentación del proyecto
+├── ensamblador.py      # clase EnsambladorIA32 con todo el ensamblador
+├── programa.asm        # entrada con código en ensamblador
+├── programa.hex        # salida: código máquina hexadecimal
+├── simbolos.txt        # salida: tabla de símbolos
+├── referencias.txt     # salida: referencias a etiquetas
+└── README.md           # documentación (esta actualización)
 ```
 
----
-
-## Ejecución
-
-### Requisitos
-
-- Python 3.6 o superior
-
-### Instrucciones
-
-1. Escribe tu código ensamblador en `programa.asm` utilizando instrucciones compatibles.
-2. Ejecuta el ensamblador desde la terminal:
-
-```bash
-python ensamblador.py
-```
-
-3. Se generarán automáticamente los siguientes archivos:
-   - `programa.hex`
-   - `simbolos.txt`
-   - `referencias.txt`
+- Se apoya en diccionarios `REGISTROS`, `INSTRUCCIONES_*` para generar opcodes.  
+- En `procesar_linea()`, se manejan secciones (`.data`, `.text`), etiquetas (almacenadas en `tabla_simbolos`), instrucciones con operandos variados, y se generan entradas en `tabla_referencias` según necesite relleno.  
+- `resolver_referencias()` rellena, tras el parseo inicial, los desplazamientos relativos o absolutos desde las posiciones originales.
 
 ---
 
-## Instrucciones Soportadas
+## 4. Pruebas  
+Para verificar el ensamblador:
 
-### Transferencia y operaciones
+1. **Casos básicos**:  
+   - `mov eax, ebx` → 0x89 / modrm 0xD8.  
+   - `add eax, [var]`, `mov [var], eax`, con relleno de direcciones.  
+   - Saltos: `jmp etiqueta`, `je etiqueta`.  
+   - `call`, `ret`, `push` y `pop` con registros, inmediatos, caracteres.  
+   - Interrupciones: `int 0x80`.
 
-| Instrucción | Descripción                                             |
-|------------|----------------------------------------------------------|
-| `mov`      | Mueve datos entre registros o hacia/desde memoria        |
-| `add`      | Suma valores de registros o memoria                      |
-| `cmp`      | Compara dos operandos                                    |
-| `test`     | Operación lógica AND (sin guardar resultado)             |
-| `imul`     | Multiplicación de enteros con signo                      |
-| `inc`      | Incrementa el valor de un registro                       |
-| `dec`      | Decrementa el valor de un registro                       |
+2. **Etiquetas y referencias**:  
+   - Crear mini-programas con múltiples saltos, llamadas, loops, con comprobación de que `programa.hex`, `simbolos.txt` y `referencias.txt` reflejan correctamente las direcciones.
 
-### Saltos condicionales e incondicionales
+3. **.data**:  
+   - Verificar que variables definidas con `dd` se ubiquen correctamente en la sección de datos y las referencias a memoria se resuelvan.
 
-| Instrucción | Descripción                                      |
-|------------|---------------------------------------------------|
-| `jmp`      | Salto incondicional                               |
-| `je`, `jne`| Saltos condicionales según resultado previo       |
-| `jg`, `jge`| Salta si mayor / mayor o igual                    |
-| `jl`, `jle`| Salta si menor / menor o igual                    |
-| `loop`     | Disminuye `ecx` y salta si no es 0                |
-
-### Subrutinas y pila
-
-| Instrucción | Descripción                                                  |
-|------------|---------------------------------------------------------------|
-| `call`     | Llama a subrutina                                             |
-| `ret`      | Retorna de subrutina                                          |
-| `push`     | Apila un valor o registro                                     |
-| `pop`      | Saca un valor de la pila                                      |
-| `leave`    | Limpia el stack frame (equivale a `mov esp, ebp` + `pop ebp`) |
-
-### Interrupciones
-
-| Instrucción | Descripción                                     |
-|------------|--------------------------------------------------|
-| `int`      | Ejecuta una interrupción del sistema (ej: `int 0x80`) |
+4. **Tests unitarios (opcional)**:  
+   - Usar `unittest` o `pytest` para verificar bytes resultantes de cada instrucción desde cadenas de entrada.
 
 ---
 
-## Registros Soportados
+## 5. Manual de usuario  
+Instrucciones para usar el ensamblador:
 
-| Registro | Función                         |
-|----------|----------------------------------|
-| `eax`    | Acumulador general               |
-| `ebx`    | Base                             |
-| `ecx`    | Contador                         |
-| `edx`    | Datos                            |
-| `esi`    | Fuente para cadenas              |
-| `edi`    | Destino para cadenas             |
-| `esp`    | Puntero de pila                  |
-| `ebp`    | Base del stack frame             |
+1. Instalar Python 3.6 o superior.  
+2. Escribir el ensamblador en `programa.asm`.  
+3. Ejecutar:
+   ```
+   python ensamblador.py
+   ```
+4. Archivos generados:  
+   - `programa.hex`: salida de bytes.  
+   - `simbolos.txt`: direcciones de variables y etiquetas.  
+   - `referencias.txt`: posiciones de saltos y llamadas.
 
----
-
-## Funcionamiento Interno
-
-El ensamblador procesa el archivo `.asm` en **dos fases** principales:
-
-1. **Análisis de etiquetas**:  
-   Se registran las etiquetas con su dirección para resolver referencias posteriores.
-
-2. **Traducción a código máquina**:  
-   Cada instrucción se convierte a su equivalente en hexadecimal, y se genera el archivo `programa.hex`.
-
-### Componentes clave del código
-
-- `procesar_linea(linea)` → Traduce una línea ensamblador a código máquina.
-- `resolver_referencias()` → Resuelve direcciones relativas/absolutas de etiquetas.
-- `ensamblar(lineas)` → Orquesta todo el proceso de ensamblaje.
-- `guardar_archivos()` → Genera los archivos `.hex`, `.txt`, etc.
+**Sintaxis soportada**:  
+- Secciones: `section .data`, `section .text`.  
+- Definición de datos: `var dd 1, 2, 3`.  
+- Instrucciones comunes: `mov`, `add`, `sub`, `cmp`, `test`, `xor`, `imul`, `inc`, `dec`, saltos (`jmp`, `je`, `jne`, etc.), `push`, `pop`, `call`, `ret`, `leave`, `int`, `loop`.
 
 ---
 
-## Consideraciones
+## 6. Manual técnico  
+Detalla los componentes:
 
-- No se soportan **macros**, directivas como `.data` o `.text`, ni estructuras avanzadas.
-- Las etiquetas deben ser **únicas** y estar correctamente posicionadas.
-- El conjunto de instrucciones cubre los requisitos para ejecutar ejemplos como:
-  - Factorial
-  - Serie de Fibonacci
-  - Ordenamiento burbuja
-  - Torres de Hanoi
+- **Clases/Diccionarios**:  
+  - `REGISTROS`: asignación del registro a un código.  
+  - `INSTRUCCIONES_REG_REG`: opcodes base.  
+  - Otras estructuras `INSTRUCCIONES_SALTOS`, etc.
+
+- **Procesamiento de operandos**:  
+  - Registro directo.  
+  - Memoria: detección con `es_memoria()`, mod‑rm, relleno de 4 bytes y referencias.  
+  - Inmediatos: códigos especiales para `mov registro, inmediato` y `push inmediato`.
+
+- **Resolución de referencias**:  
+  - Relativa: saltos (`jmp`, `je`, `call`, `loop`) calculados desde posición actual.  
+  - Absoluta: direcciones de memoria, se almacena directo en 4 bytes en little‑endian.
+
+- **Salida de archivos**:  
+  - `programa.hex`: bytes formateados en hexadecimal.  
+  - `simbolos.txt`, `referencias.txt`: para debugging y enlace.
 
 ---
 
-```
-╔════════════════════════════════════════════════════════╗
-║////////////////////////////////////////////////////////║
-║#######    ALUMNO: Ortiz García Pablo Adrián     #######║
-║////////////////////////////////////////////////////////║
-╚════════════════════════════════════════════════════════╝
-```
+## 7. Conclusiones  
 
+### Personales (Ortiz García Pablo Adrián)  
+- He logrado implementar un ensamblador funcional, con soporte para una amplia gama de instrucciones del conjunto básico x86‑32.  
+- La estructura modular de la clase facilita comprender el flujo de alto nivel y mantener el código.  
+- Identifiqué y solucioné retos al manejar distintos modos de direccionamiento, cálculos de offsets relativos y absoluto, y el soporte para definiciones de datos.
 
-
-
-
-
+### Como equipo  
+- Desarrollar esta mini‑herramienta fortaleció nuestras competencias en compiladores/ensamblador, análisis de lenguaje y manejo de binarios.  
+- El involucramiento en las fases de diseño, implementación y pruebas permitió afianzar buenas prácticas de desarrollo: separación de fases, modularidad, manejo de errores (etiquetas no definidas).  
+- Como resultado, contamos con una base sólida que puede extenderse a más instrucciones, optimización y posible generación de secciones ELF o integración con enlazadores.
