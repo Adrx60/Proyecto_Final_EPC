@@ -122,14 +122,5 @@ Detalla los componentes:
 
 ---
 
-## 7. Conclusiones  
-
-### Personales (Ortiz García Pablo Adrián)  
-- He logrado implementar un ensamblador funcional, con soporte para una amplia gama de instrucciones del conjunto básico x86‑32.  
-- La estructura modular de la clase facilita comprender el flujo de alto nivel y mantener el código.  
-- Identifiqué y solucioné retos al manejar distintos modos de direccionamiento, cálculos de offsets relativos y absoluto, y el soporte para definiciones de datos.
-
-### Como equipo  
-- Desarrollar esta mini‑herramienta fortaleció nuestras competencias en compiladores/ensamblador, análisis de lenguaje y manejo de binarios.  
-- El involucramiento en las fases de diseño, implementación y pruebas permitió afianzar buenas prácticas de desarrollo: separación de fases, modularidad, manejo de errores (etiquetas no definidas).  
-- Como resultado, contamos con una base sólida que puede extenderse a más instrucciones, optimización y posible generación de secciones ELF o integración con enlazadores.
+## 7. Conclusiones    
+El desarrollo del ensamblador implicó una comprensión profunda de la arquitectura IA-32, así como del funcionamiento interno del proceso de traducción de instrucciones en lenguaje ensamblador a código máquina. Además, facilitó el análisis y ejecución de programas más complejos como el cálculo del factorial, la serie de Fibonacci, el ordenamiento burbuja y la resolución de las Torres de Hanoi. El resultado es una herramienta funcional, educativa y expandible que simula una parte fundamental del ciclo de vida de los programas en bajo nivel.
